@@ -1,87 +1,114 @@
 
-# Cursor Pagination with Server-Side Data Handling 🚀
+# Cursor Pagination in .NET 🚀
 
-Efficiently paginate large datasets using **cursor-based pagination** implemented with server-side logic and a dynamic data table. Perfect for high-traffic applications requiring real-time data consistency and performance.
+Efficient server-side cursor pagination implemented in **.NET** for handling large datasets. Ideal for APIs, web apps, and services requiring high performance with real-time data consistency.
 
 ## 📖 Overview
-Traditional offset pagination (`LIMIT` and `OFFSET`) becomes inefficient with large datasets. This project demonstrates **cursor pagination**, which uses a pointer (cursor) to track the next set of records, improving performance and scalability.
+This project demonstrates cursor-based pagination in a **.NET backend**, avoiding traditional `OFFSET`-based pagination for better scalability. The cursor mechanism uses a unique identifier (e.g., sequential ID or timestamp) to paginate records efficiently.
 
 ## ✨ Features
-- **Server-Side Pagination**: Efficiently handle large datasets without client-side overhead.
-- **Cursor Mechanism**: Uses a unique identifier (e.g., timestamp or UUID) to paginate records.
-- **Dynamic Data Table**: Client-side table with seamless pagination controls (Next/Previous).
-- **Scalable Architecture**: Optimized for high-throughput APIs and real-time data.
-- **Consistency**: Avoid duplicates or skipped records during data mutations.
+- **.NET 6/7/8 API**: Robust backend with optimized cursor logic.
+- **Entity Framework Core**: Database queries with cursor-based filtering.
+- **Scalable Architecture**: Designed for high-throughput applications.
+- **Consistent Pagination**: Resilient to concurrent data changes.
+- **Clean API Responses**: Returns `nextCursor` and `prevCursor` for seamless navigation.
 
 ## 🛠️ Installation
 1. Clone the repository:
    ```bash
    git clone [your-repository-url]
    ```
-2. Install dependencies:
+2. Install dependencies (NuGet packages):
    ```bash
-   cd server && npm install
-   cd ../client && npm install
+   dotnet restore
    ```
-3. Configure environment variables (database, port, etc.) in `.env`.
+3. Configure your database connection in `appsettings.json`:
+   ```json
+   "ConnectionStrings": {
+     "DefaultConnection": "Your_Database_Connection_String"
+   }
+   ```
+4. Apply database migrations:
+   ```bash
+   dotnet ef database update
+   ```
 
 ## 🚀 Usage
-1. Start the server:
+1. Run the .NET API:
    ```bash
-   cd server && npm start
+   dotnet run --project YourProject.Api
    ```
-2. Run the client:
-   ```bash
-   cd client && npm start
+2. Use a client (e.g., Postman, React, Angular) to call the paginated endpoint:
+   ```http
+   GET /api/items?pageSize=20&cursor=abc123
    ```
-3. Navigate through the data table using **Next**/**Previous** buttons.
+3. Navigate using the `nextCursor` or `prevCursor` in the API response.
 
-## 🔍 How It Works
-### Server-Side
-- **Cursor Logic**: The server returns a `nextCursor` and `prevCursor` in the API response.
-- **Database Query**: Uses `WHERE` clauses with cursor values (e.g., `id > :cursor`) for efficient data retrieval.
+---
 
-Example API response:
-```json
-{
-  "data": [...],
-  "pagination": {
-    "nextCursor": "abc123",
-    "prevCursor": "xyz789",
-    "hasNext": true
+### 🔍 How It Works
+#### Server-Side (.NET API)
+- **Cursor Logic**:  
+  The API uses a column (e.g., `Id` or `CreatedAt`) as the cursor. Example query with Entity Framework:
+  ```csharp
+  var query = _context.Items
+      .Where(i => i.Id > cursor)
+      .OrderBy(i => i.Id)
+      .Take(pageSize);
+  ```
+
+- **API Endpoint**:  
+  Returns paginated data with cursors:
+  ```csharp
+  [HttpGet]
+  public ActionResult<PagedResponse<Item>> GetItems([FromQuery] int pageSize, [FromQuery] string cursor)
+  {
+      var items = _service.GetItems(pageSize, cursor);
+      return Ok(new PagedResponse<Item>
+      {
+          Data = items,
+          NextCursor = items.LastOrDefault()?.Id.ToString(),
+          HasNext = items.Count >= pageSize
+      });
   }
-}
-```
+  ```
 
-### Client-Side
-- **Data Table**: Renders paginated data and manages cursor state.
-- **API Integration**: Fetches new data when navigating using cursors.
+#### Client-Side
+- Use the `nextCursor`/`prevCursor` from the API to request subsequent pages.
+- Example client implementation (React/Angular/Blazor) included in the repo.
+
+---
 
 ## 💡 Why Cursor Pagination?
-- **Performance**: Avoids `OFFSET` scans, reducing database load.
-- **Scalability**: Ideal for infinite scroll or real-time feeds.
-- **Consistency**: Resilient to concurrent data updates.
+- **Performance**: Avoids `OFFSET` overhead in SQL queries.
+- **Scalability**: Handles millions of records efficiently.
+- **Consistency**: No duplicates/skipped data during pagination.
 
 ## 📂 Repository Structure
 ```
-├── server/               # Backend (Node.js/Express)
-│   ├── controllers/      # Pagination logic
-│   ├── routes/           # API endpoints
-│   └── ...
-├── client/               # Frontend (React/Data Table)
-│   ├── components/       # Table and pagination UI
-│   └── ...
+├── YourProject.Api/         # .NET Web API
+│   ├── Controllers/         # API endpoints
+│   ├── Models/              # Database models
+│   ├── Services/            # Pagination logic
+│   ├── Migrations/          # Database migrations
+│   └── appsettings.json     # Configuration
+├── YourProject.Client/      # Frontend (optional)
+│   ├── Pages/               # UI components
+│   └── ...                 
 └── README.md
 ```
 
 ## 🤝 Contributing
-Pull requests are welcome! For major changes, open an issue first to discuss improvements.
+Open to contributions! Fork the repo, create a branch, and submit a PR.
 
 ## 📄 License
 MIT
 
 ---
 
-🌟 **Star the repo** if you find this useful!  
-🔗 [[GitHub Repository Link]([your-repo-url-here])](https://github.com/Tayyab94/cursor-pagination/)
+🌟 **Star the repo** if this helps you build faster, scalable APIs!  
+🔗 [[GitHub Repository Link]([your-repo-url-here])](https://github.com/Tayyab94/cursor-pagination)
 ```
+
+
+Let me know if you want to expand any section! 😊
