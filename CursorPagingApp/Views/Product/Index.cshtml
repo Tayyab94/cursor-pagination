@@ -1,0 +1,56 @@
+﻿
+@model List<Product>
+@{
+    ViewBag.Title = "Products";
+}
+
+<h2>Product List</h2>
+
+<!-- Category Filter -->
+<form method="get">
+    <label>Category:</label>
+   <select name="category" onchange="this.form.submit()">
+    <option value="">All</option>
+    <option value="Electronics" selected="@(ViewBag.CurrentCategory == "Electronics")">Electronics</option>
+    <option value="Clothing" selected="@(ViewBag.CurrentCategory == "Clothing")">Clothing</option>
+    <option value="Toys" selected="@(ViewBag.CurrentCategory == "Toys")">Toys</option>
+</select>
+</form>
+
+<!-- Table -->
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Category</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td>@product.Id</td>
+                <td>@product.Name</td>
+                <td>@product.Category</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="pagination">
+    @if (!ViewBag.IsFirstPage)
+    {
+            <a href="@Url.Action("Index", new { category = ViewBag.CurrentCategory })" class="btn btn-primary">First Page</a>
+    }
+
+    @if (!ViewBag.IsFirstPage)
+    {
+            <a href="@Url.Action("Index", new { lastId = ViewBag.LastId, category = ViewBag.CurrentCategory })" class="btn btn-secondary">Previous</a>
+    }
+
+    @if (!ViewBag.IsLastPage)
+    {
+            <a href="@Url.Action("Index", new { lastId = ViewBag.LastId, category = ViewBag.CurrentCategory })" class="btn btn-success">Next</a>
+    }
+</div>

@@ -1,0 +1,69 @@
+﻿@model List<Product>
+@{
+    ViewBag.Title = "Products";
+}
+
+<h2>Product List</h2>
+
+<!-- Filters -->
+<form method="get" class="mb-3">
+    <label>Category:</label>
+    <select name="category">
+        <option value="">All</option>
+        <option value="Electronics" selected="@(ViewBag.CurrentCategory == "Electronics")">Electronics</option>
+        <option value="Clothing" selected="@(ViewBag.CurrentCategory == "Clothing")">Clothing</option>
+        <option value="Toys" selected="@(ViewBag.CurrentCategory == "Toys")">Toys</option>
+    </select>
+
+    <label>Name:</label>
+    <input type="text" name="name" value="@ViewBag.CurrentName" />
+
+    <button type="submit" class="btn btn-primary">Filter</button>
+</form>
+
+<!-- Table -->
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Category</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td>@product.Id</td>
+                <td>@product.Name</td>
+                <td>@product.Category</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Pagination UI -->
+<div class="pagination">
+    @if (!ViewBag.IsFirstPage)
+    {
+        <a href="@Url.Action("Index1", new { category = ViewBag.CurrentCategory, name = ViewBag.CurrentName })" class="btn btn-primary">First</a>
+    }
+
+    @if (!ViewBag.IsFirstPage)
+    {
+        <a href="@Url.Action("Index1", new { lastId = ViewBag.LastId - 20, category = ViewBag.CurrentCategory, name = ViewBag.CurrentName })" class="btn btn-secondary">Previous</a>
+    }
+
+    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+    {
+        <a href="@Url.Action("Index1", new { lastId = (i - 1) * 10, category = ViewBag.CurrentCategory, name = ViewBag.CurrentName })"
+           class="btn @(ViewBag.CurrentPage == i ? "btn-success" : "btn-light")">
+            @i
+        </a>
+    }
+
+    @if (!ViewBag.IsLastPage)
+    {
+        <a href="@Url.Action("Index1", new { lastId = ViewBag.LastId, category = ViewBag.CurrentCategory, name = ViewBag.CurrentName })" class="btn btn-success">Next</a>
+    }
+</div>

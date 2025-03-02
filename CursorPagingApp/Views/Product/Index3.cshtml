@@ -1,0 +1,41 @@
+﻿@model List<Product>
+
+<h2>Products</h2>
+
+<form method="get">
+    <select name="category">
+        <option value="">All</option>
+        <option value="Electronics">Electronics</option>
+        <option value="Clothing">Clothing</option>
+        <option value="Toys">Toys</option>
+    </select>
+    <input type="text" name="name" placeholder="Search Name" />
+    <button type="submit">Filter</button>
+</form>
+
+<table>
+    <tr><th>ID</th><th>Name</th><th>Category</th></tr>
+    @foreach (var product in Model)
+    {
+        <tr>
+            <td>@product.Id</td>
+            <td>@product.Name</td>
+            <td>@product.Category</td>
+        </tr>
+    }
+</table>
+
+<div>
+    @if (!ViewBag.IsFirstPage)
+    {
+        <a href="@Url.Action("Index3")">First</a>
+    }
+    @if (!ViewBag.IsFirstPage)
+    {
+        <a href="@Url.Action("Index3", new { cursorId = ViewBag.PrevCursor, prev = true })">Previous</a>
+    }
+    @if (!ViewBag.IsLastPage)
+    {
+        <a href="@Url.Action("Index3", new { cursorId = ViewBag.NextCursor })">Next</a>
+    }
+</div>

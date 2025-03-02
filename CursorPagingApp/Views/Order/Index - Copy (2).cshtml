@@ -1,0 +1,54 @@
+﻿@{
+    ViewData["Title"] = "Products";
+}
+
+<h2>Products</h2>
+
+<table id="productsTable" class="display" style="width:100%">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Category</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            let cursorId = null; // Cursor for pagination
+
+            $('#productsTable').DataTable({
+                processing: true,
+                serverSide: true,
+                searching: true,
+                ordering: false,
+                paging: true,
+                ajax: function (data, callback) {
+                    $.ajax({
+                        url: '@Url.Action("GetProducts", "Order")',
+                        data: {
+                            cursorId: cursorId,
+                            search: data.search.value
+                        },
+                        success: function (response) {
+                            cursorId = response.nextCursor; // Update cursor
+
+                            callback({
+                                data: response.data
+                            });
+                        }
+                    });
+                },
+                columns: [
+                    { data: "id" },
+                    { data: "name" },
+                    { data: "category" }
+                ]
+            });
+        });
+    </script>
+}
+
